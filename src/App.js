@@ -24,7 +24,8 @@ class Auth extends Component {
       password: '',
       autherror: null,
       authsuccess: null,
-      username: null
+      username: null,
+      sossuccess: null
     };
 
     this.handleChangeLogin = this.handleChangeLogin.bind(this);
@@ -64,6 +65,10 @@ class Auth extends Component {
     this.setState({password: event.target.value});
     this.setState({autherror: null});
   }
+  getSOS(event) {
+    var sossuccess = document.getElementById('sossuccess');
+    sossuccess.style.display = 'block';
+  }
   render() {
     return (
       <div>
@@ -101,9 +106,15 @@ class Auth extends Component {
           <Alert bsStyle="success">
             <strong>{this.state.username}, welcome to Zombie Maps!</strong>
           </Alert>
-          <Button bsSize="large" style={{backgroundColor: 'red', color: 'white'}} block>
+          <Button bsSize="large" onClick={this.getSOS} style={{backgroundColor: 'red', color: 'white'}} block>
             SOS
           </Button>
+          <div id="sossuccess" style={{ display: 'none' }}>
+            <Alert bsStyle="success">
+              <strong>Your message has been sent! Rescuers left.</strong>
+            </Alert>
+          </div>
+          <br/>
           <Button bsSize="large" block>
             Sign out
           </Button>
