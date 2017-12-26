@@ -8,6 +8,7 @@
     "react-bootstrap": "^0.31.5",
     "react-dom": "^16.2.0",
     "react-scripts": "1.0.17",
+    "react-yandex-maps": "^2.1.4",
     "yandex-map-react": "^1.1.1"
   },
   "scripts": {

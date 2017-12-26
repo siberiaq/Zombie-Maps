@@ -4,16 +4,33 @@ import './App.css';
 import style from './bootstrap/css/bootstrap.css';
 import {Tabs, Tab, InputGroup, Navbar, Alert, NavItem, Nav, Grid, Row, Col, Button, Form, FormGroup, FormLabel, ControlLabel, FormControl, Checkbox} from "react-bootstrap";
 import axios from 'axios';
-import { Map, Marker, MarkerLayout } from 'yandex-map-react';
+import { YMaps, Map, Clusterer, Placemark, Circle } from 'react-yandex-maps';
+
+import points from './points.json';
+
+const mapState = {
+  center: [55.751574, 37.573856],
+  zoom: 9,
+  behaviors: ['default', 'scrollZoom'],
+};
+
+const getPointData = index => {
+  return {
+    balloonContentBody: 'placemark <strong>balloon ' + index + '</strong>',
+    clusterCaption: 'placemark <strong>' + index + '</strong>',
+  };
+};
+
+const getPointOptions = () => {
+  return {
+    preset: 'islands#violetIcon',
+  };
+};
 
 const markerStyles = {
     width: '50px',
     height: '50px',
     overflow: 'visible'
-};
-
-const mapState = {
-    controls: ['default']
 };
 
 class Auth extends Component {
@@ -242,23 +259,57 @@ class App extends Component {
           <Row>
             <Col xs={12} md={8}>
               <div id="mapp" style={{ display: 'none' }}>
-                <Map onAPIAvailable={function () { console.log('API loaded'); }} state={mapState} center={[33.557858, -84.684935]} zoom={8}>
-                  <Marker lat={33.557858} lon={-84.684935}>
-                    <MarkerLayout>
-                      <img style={markerStyles} src="https://lh4.ggpht.com/sgCVzA-ij2wYAd5p0NhpcLDzw7wxWagjFCRlU92SVhgA4U35wdw7pHAz6-T49GX1C6M=w300"/>
-                    </MarkerLayout>
-                  </Marker>
-                  <Marker lat={33.558859} lon={-83.684935}>
-                    <MarkerLayout>
-                      <img style={markerStyles} src="http://lh6.ggpht.com/IcOuvzMu4ARryJ8jlY9I0K-icSjJBU-zY64T4tRJakNA0-MPBR0HmkA_zqhVazxtYuo=w300"/>
-                    </MarkerLayout>
-                  </Marker>
-                  <Marker lat={32.558859} lon={-85.684935}>
-                  <MarkerLayout>
-                    <img style={markerStyles} src="https://www.netfort.com/assets/zombie.png"/>
-                  </MarkerLayout>
-                </Marker>
-                </Map>
+              <YMaps>
+                  <Map state={mapState} width={700} height={500}>
+                    <Clusterer
+                      options={{
+                        preset: 'islands#invertedVioletClusterIcons',
+                        groupByCoordinates: false,
+                        clusterDisableClickZoom: true,
+                        clusterHideIconOnBalloonOpen: false,
+                        geoObjectHideIconOnBalloonOpen: false,
+                      }}
+                    >
+                      {points.map((coordinates, idx) =>
+                        <Placemark
+                          key={idx}
+                          geometry={{ coordinates }}
+                          properties={getPointData(idx)}
+                          options={getPointOptions()}
+                        />
+                      )}
+                    </Clusterer>
+                    <Circle
+                      geometry={{
+                        // The coordinates of the center of the circle.
+                        coordinates: [55.76, 37.6],
+                        // The radius of the circle in meters.
+                        radius: 25000,
+                      }}
+                      properties={{
+                        // Describing the properties of the circle.
+                        // The contents of the balloon.
+                        balloonContent: 'The radius of the infection - 25 km',
+                        // The contents of the hint.
+                      }}
+                      options={{
+                        // Setting the circle options.
+                        // Enabling drag-n-drop for the circle.
+                        draggable: true,
+                        // Fill color. The last byte (77) defines transparency.
+                        // The transparency of the fill can also be set using
+                        // the option "fillOpacity".
+                        fillColor: '#DB709377',
+                        // Stroke color.
+                        strokeColor: '#990066',
+                        // Stroke transparency.
+                        strokeOpacity: 0.8,
+                        // The width of the stroke in pixels.
+                        strokeWidth: 5,
+                      }}
+                    />
+                  </Map>
+                </YMaps>
               </div>
             </Col>
             <Col xs={6} md={4}>
