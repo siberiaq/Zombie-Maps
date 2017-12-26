@@ -47,6 +47,8 @@ class Auth extends Component {
           self.setState({username: response.data.name});
           var map = document.getElementById('mapp');
           map.style.display = 'block';
+          var tabs = document.getElementsByClassName('nav nav-tabs')[0];
+          tabs.style.display = 'none';
         } else if(response.data.status == 'error') {
           self.setState({autherror: response.data.message});
         } else {
@@ -99,6 +101,9 @@ class Auth extends Component {
           <Alert bsStyle="success">
             <strong>{this.state.username}, welcome to Zombie Maps!</strong>
           </Alert>
+          <Button bsSize="large" style={{backgroundColor: 'red', color: 'white'}} block>
+            SOS
+          </Button>
           <Button bsSize="large" block>
             Sign out
           </Button>
@@ -138,6 +143,8 @@ class Reg extends Component {
     })
       .then(function (response) {
         if (response.data.status == 'complete') {
+          var tabs = document.getElementsByClassName('nav nav-tabs')[0];
+          tabs.style.display = 'none';
           self.setState({username: response.data.name});
           self.setState({authsuccess: true});
           setTimeout('window.location.reload()', 3000);
