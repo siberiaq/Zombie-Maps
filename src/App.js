@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import "./bootstrap/css/bootstrap.css";
-import { InputGroup, Navbar, Alert, NavItem, Nav, Grid, Row, Col, Button, Form, FormGroup, FormLabel, ControlLabel, FormControl, Checkbox} from "react-bootstrap";
+import style from './bootstrap/css/bootstrap.css';
+import {Tabs, Tab, InputGroup, Navbar, Alert, NavItem, Nav, Grid, Row, Col, Button, Form, FormGroup, FormLabel, ControlLabel, FormControl, Checkbox} from "react-bootstrap";
 import axios from 'axios';
 import { Map, Marker, MarkerLayout } from 'yandex-map-react';
 
@@ -66,16 +66,15 @@ class Auth extends Component {
     return (
       <div>
         <Form style={this.state.authsuccess ? {display: 'none'} : {}} onSubmit={this.handleSubmit} horizontal>
-          <FormGroup bsSize="large" controlId="formHorizontalEmail">
+          <FormGroup controlId="formHorizontalEmail">
             <Col sm={10}>
               <InputGroup>
-                <InputGroup.Addon>@</InputGroup.Addon>
                 <FormControl name="login" type="text" value={this.state.login} onChange={this.handleChangeLogin} placeholder="Email" />
               </InputGroup>
             </Col>
           </FormGroup>
 
-          <FormGroup bsSize="large" controlId="formHorizontalPassword">
+          <FormGroup controlId="formHorizontalPassword">
             <Col sm={10}>
               <InputGroup>
                 <FormControl name="password" type="password" value={this.state.password} onChange={this.handleChangePassword} placeholder="Password" />
@@ -84,9 +83,9 @@ class Auth extends Component {
           </FormGroup>
 
           <FormGroup>
-            <Col smOffset={2} sm={10}>
+            <Col sm={10}>
               <Button bsSize="large" type="submit" block>
-                Sign in
+                Sign In
               </Button>
             </Col>
           </FormGroup>
@@ -103,6 +102,109 @@ class Auth extends Component {
           <Button bsSize="large" block>
             Sign out
           </Button>
+        </div>
+      </div>
+    );
+  }
+}
+
+class Reg extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      login: '',
+      regname: '',
+      password: '',
+      autherror: null,
+      authsuccess: null,
+      username: null
+    };
+
+    this.handleChangeLogin = this.handleChangeLogin.bind(this);
+    this.handleChangeName = this.handleChangeName.bind(this);
+    this.handleChangePassword = this.handleChangePassword.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    var self = this;
+    axios.get('https://api.siberiaq.com/zmaps/Reg/', {
+      params: {
+        login: this.state.login,
+        name: this.state.regname,
+        password: this.state.password
+      }
+    })
+      .then(function (response) {
+        if (response.data.status == 'complete') {
+          self.setState({username: response.data.name});
+          self.setState({authsuccess: true});
+          setTimeout('window.location.reload()', 3000);
+        } else if(response.data.status == 'error') {
+          self.setState({autherror: response.data.message});
+        } else {
+          console.log('?');
+        }
+    })
+  }
+  handleChangeLogin(event) {
+    this.setState({login: event.target.value});
+    this.setState({autherror: null});
+  }
+  handleChangePassword(event) {
+    this.setState({password: event.target.value});
+    this.setState({autherror: null});
+  }
+  handleChangeName(event) {
+      this.setState({regname: event.target.value});
+      this.setState({autherror: null});
+  }
+  render() {
+    return (
+      <div>
+        <Form style={this.state.authsuccess ? {display: 'none'} : {}} onSubmit={this.handleSubmit} horizontal>
+          <FormGroup controlId="formHorizontalEmail">
+            <Col sm={10}>
+              <InputGroup>
+                <FormControl name="login" type="text" value={this.state.login} onChange={this.handleChangeLogin} placeholder="Login" />
+              </InputGroup>
+            </Col>
+          </FormGroup>
+
+          <FormGroup controlId="formHorizontalName">
+            <Col sm={10}>
+              <InputGroup>
+                <FormControl name="name" type="text" value={this.state.regname} onChange={this.handleChangeName} placeholder="Name" />
+              </InputGroup>
+            </Col>
+          </FormGroup>
+
+          <FormGroup controlId="formHorizontalPassword">
+            <Col sm={10}>
+              <InputGroup>
+                <FormControl name="password" type="password" value={this.state.password} onChange={this.handleChangePassword} placeholder="Password" />
+              </InputGroup>
+            </Col>
+          </FormGroup>
+
+          <FormGroup>
+            <Col sm={10}>
+              <Button bsSize="large" type="submit" block>
+                Sign Up
+              </Button>
+            </Col>
+          </FormGroup>
+        </Form>
+        <div style={{width: 295}}>
+          <Alert style={this.state.autherror ? {} : { display: 'none' }} bsStyle="danger">
+            <strong>{this.state.autherror}</strong>
+          </Alert>
+        </div>
+        <div style={{width: 295}} style={this.state.authsuccess ? {} : { display: 'none' }}>
+          <Alert bsStyle="success">
+            <strong>{this.state.username}, thank you for registration on Zombie Maps!</strong>
+          </Alert>
         </div>
       </div>
     );
@@ -142,7 +244,12 @@ class App extends Component {
               </div>
             </Col>
             <Col xs={6} md={4}>
-              <Auth/>
+              <div>
+                <Tabs defaultActiveKey={1} animation={false} id="noanim-tab-example">
+                  <Tab style={{margin: 0}} eventKey={1} title="Sign In"><br/><Auth/></Tab>
+                  <Tab eventKey={2} title="Sign Up"><br/><Reg/></Tab>
+                </Tabs>
+              </div>
             </Col>
           </Row>
         </Grid>
